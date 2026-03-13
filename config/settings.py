@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 from loguru import logger
@@ -9,6 +10,8 @@ LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
 class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: LogLevel | int = "INFO"
+
+    BASE_PATH: Path = Path.home()
 
     class Config:
         env_file = ".env"
