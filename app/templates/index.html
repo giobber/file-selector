@@ -11,10 +11,16 @@
   <body>
     <h1>HTMX & FastAPI {% if debug %}(DEBUG){% endif %}</h1>
     <header class="flex flex-row w-100">
-      <button hx-get="/path" hx-swap="innerHTML" hx-target="#main">refresh</button>
+      <form id="form-path" hx-post="/root" hx-target="#main" hx-swap="innerHTML">
+        <input
+          id="form-path-input"
+          name="path"
+          type="text"
+          placeholder="Insert sub-path here"
+        />
+        <button type="submit">Go</button>
+      </form>
     </header>
-    <main id="main" class="w-100"></main>
-
-    <h2>Click the Button:</h2>
+    <main id="main" class="w-100" hx-get="/root" hx-trigger="load"></main>
   </body>
 </html>
