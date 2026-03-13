@@ -1,6 +1,11 @@
-<table class="table w-100">
+{% if not path.exists() %}
+<p>Path {{ path }} doesn't exists</p>
+<p>Return to <a href="/">Base Folder</a></p>
+{% else %}
+<table class="table">
   <thead>
     <tr>
+      <th></th>
       <th></th>
       <th>Name</th>
       <th>Size</th>
@@ -10,15 +15,56 @@
     </tr>
   </thead>
   <tbody class="courier">
+    <!-- Back one folder -->
+    {% if back_path %}
+    <tr>
+      <td></td>
+      <td>🖿</td>
+      <td class="tl ph2 gray">
+        <input type="hidden" id="item-path-back" name="path" value="{{ back_path }}" />
+        <a
+          class="link"
+          hx-post="/root"
+          hx-include="#item-path-back"
+          hx-target="#main"
+          hx-swap="innerHTML"
+        >
+          Parent Folder
+        </a>
+      </td>
+    </tr>
+    {% endif %}
+
+    <!-- Content rows-->
     {% for item in contents %}
     <tr>
       <td><input type="checkbox" name="selected" /></td>
-      <td class="tl">{{ item.name }}</td>
-      <td class="tr">{{ item.size | formatsize }}</td>
-      <td class="tc">{{ item.created.strftime("%d/%m/%y") }}</td>
-      <td class="tc">{{ item.modified.strftime("%d/%m/%y") }}</td>
+      <td class="tc">{% if item.path.is_dir() %}🖿{% else %}🗋 {% endif %}</td>
+      <td class="tl ph2 nowrap overflow-auto text-overflow measure-narrow">
+        {% if item.path.is_dir() %}
+        <input
+          type="hidden"
+          id="item-path--{{loop.index}}"
+          name="path"
+          value="{{ item.path.relative_to(base_path) }}"
+        />
+        <a
+          class="link truncate"
+          hx-post="/root"
+          hx-include="#item-path--{{loop.index}}"
+          hx-target="#main"
+          hx-swap="innerHTML"
+        >
+          {{ item.name }}
+        </a>
+        {% else %} {{ item.name }} {% endif %}
+      </td>
+      <td class="tr ph2 nowrap">{{ item.size | formatsize }}</td>
+      <td class="tc ph2">{{ item.created.strftime("%d/%m/%y") }}</td>
+      <td class="tc ph2">{{ item.modified.strftime("%d/%m/%y") }}</td>
       <td class="tc"><button type="button">Edit</button></td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+{% endif %}

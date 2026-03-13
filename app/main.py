@@ -32,17 +32,30 @@ async def home(request: Request, settings: Settings = Depends(get_settings)):
 @app.post("/root", response_class=HTMLResponse)
 async def path_contents(request: Request, settings: Settings = Depends(get_settings)):
     path = settings.BASE_PATH
+    # NOTE: path_data is only the sub-path relative_to BASE_PATH
     if request.method == "POST":
         form_data = await request.form()
         path_data = form_data.get("path", "")
+
         if path_data and isinstance(path_data, str):
             path /= path_data.strip("/")
 
-    logger.debug(f"Request path: {path}")
+    logger.debug(f"Request path: {path} (BASE_PATH={settings.BASE_PATH})")
 
     contents = (File.from_path(p) for p in path.glob("*"))
     contents = sorted(contents, key=lambda f: f.name)
-    context = {"request": request, "contents": contents}
+    context = {
+        "request": request,
+        "contents": contents,
+        "path": path,
+        "base_path": settings.BASE_PATH,
+        # Return the sub-path only if there is a sub-path
+        "back_path": (
+            path.parent.relative_to(settings.BASE_PATH)
+            if path > settings.BASE_PATH
+            else None
+        ),
+    }
     return templates.TemplateResponse("table.html", context)
 
 
