@@ -32,7 +32,7 @@ async def path_contents(request: Request, settings: Settings = Depends(get_setti
     contents = (File.from_path(p) for p in settings.BASE_PATH.glob("*"))
     contents = sorted(contents, key=lambda f: f.name)
     context = {"request": request, "contents": contents}
-    return templates.TemplateResponse("table.j2.html", context)
+    return templates.TemplateResponse("table.html", context)
 
 
 if __name__ == "__main__":
