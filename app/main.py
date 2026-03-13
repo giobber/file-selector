@@ -28,9 +28,19 @@ async def home(request: Request, settings: Settings = Depends(get_settings)):
     return templates.TemplateResponse("index.html", context)
 
 
-@app.get("/path", response_class=HTMLResponse)
+@app.get("/root", response_class=HTMLResponse)
+@app.post("/root", response_class=HTMLResponse)
 async def path_contents(request: Request, settings: Settings = Depends(get_settings)):
-    contents = (File.from_path(p) for p in settings.BASE_PATH.glob("*"))
+    path = settings.BASE_PATH
+    if request.method == "POST":
+        form_data = await request.form()
+        path_data = form_data.get("path", "")
+        if path_data and isinstance(path_data, str):
+            path /= path_data.strip("/")
+
+    logger.debug(f"Request path: {path}")
+
+    contents = (File.from_path(p) for p in path.glob("*"))
     contents = sorted(contents, key=lambda f: f.name)
     context = {"request": request, "contents": contents}
     return templates.TemplateResponse("table.html", context)
