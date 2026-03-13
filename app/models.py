@@ -27,7 +27,7 @@ class File(BaseModel):
 
     @classmethod
     def from_path(cls, path: Path):
-        return cls(name=path.stem, path=path)
+        return cls(name=path.name, path=path)
 
 
 def format_size(default_byte_size: ByteSize):
