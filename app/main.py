@@ -5,6 +5,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
+from app.models import File
+
 from .settings import Settings, get_settings, log_settings
 
 # Setup logger
@@ -27,7 +29,8 @@ async def home(request: Request, settings: Settings = Depends(get_settings)):
 
 @app.get("/path", response_class=HTMLResponse)
 async def path_contents(request: Request, settings: Settings = Depends(get_settings)):
-    contents = ({"name": p.stem} for p in settings.BASE_PATH.glob("*"))
+    contents = (File.from_path(p) for p in settings.BASE_PATH.glob("*"))
+    contents = sorted(contents, key=lambda f: f.name)
     context = {"request": request, "contents": contents}
     return templates.TemplateResponse("table.j2.html", context)
 
