@@ -1,23 +1,23 @@
-<table>
+<table class="table w-100">
   <thead>
     <tr>
       <th></th>
       <th>Name</th>
-      <th>Weight</th>
+      <th>Size</th>
       <th>Created</th>
       <th>Updated</th>
       <th>Action</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody class="courier">
     {% for item in contents %}
     <tr>
       <td><input type="checkbox" name="selected" /></td>
-      <td>{{ item.name }}</td>
-      <td>{{ item.weight }}</td>
-      <td>{{ item.created }}</td>
-      <td>{{ item.updated }}</td>
-      <td><button type="button">Edit</button></td>
+      <td class="tl">{{ item.name }}</td>
+      <td class="tr">{{ item.size | formatsize }}</td>
+      <td class="tc">{{ item.created.strftime("%d/%m/%y") }}</td>
+      <td class="tc">{{ item.modified.strftime("%d/%m/%y") }}</td>
+      <td class="tc"><button type="button">Edit</button></td>
     </tr>
     {% endfor %}
   </tbody>

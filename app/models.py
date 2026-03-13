@@ -14,7 +14,7 @@ class File(BaseModel):
         return self.path.stat(follow_symlinks=follow_symlinks)
 
     @computed_field
-    def weight(self) -> int:
+    def size(self) -> int:
         return self.stat().st_size
 
     @computed_field
