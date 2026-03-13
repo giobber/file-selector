@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from config.settings import Settings, get_settings, log_settings
+from .settings import Settings, get_settings, log_settings
 
 # Setup logger
 logger.remove()
@@ -16,7 +16,7 @@ log_settings()
 app = FastAPI()
 
 # Set up Jinja2 templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="app/templates")
 
 
 @app.get("/", response_class=HTMLResponse)
