@@ -1,7 +1,8 @@
 import sys
+from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
@@ -22,33 +23,33 @@ templates = Jinja2Templates(directory="app/templates")
 templates.env.filters["formatsize"] = format_size(get_settings().BYTE_SIZE)
 
 
-@app.get("/", response_class=HTMLResponse)
-async def home(request: Request, settings: Settings = Depends(get_settings)):
-    context = {"request": request, "debug": settings.DEBUG}
+@app.get("/")
+async def base(request: Request):
+    return RedirectResponse(url="/home")
+
+
+@app.get("/home")
+@app.get("/home/{sub_path:path}", response_class=HTMLResponse)
+async def home(request: Request, sub_path: Path = Path("")):
+    context = {"request": request, "sub_path": sub_path}
     return templates.TemplateResponse("index.html", context)
 
 
-@app.get("/root", response_class=HTMLResponse)
-@app.post("/root", response_class=HTMLResponse)
-async def path_contents(request: Request, settings: Settings = Depends(get_settings)):
-    path = settings.BASE_PATH
-    # NOTE: path_data is only the sub-path relative_to BASE_PATH
-    if request.method == "POST":
-        form_data = await request.form()
-        path_data = form_data.get("path", "")
-
-        if path_data and isinstance(path_data, str):
-            path /= path_data.strip("/")
-
-    logger.debug(f"Request path: {path} (BASE_PATH={settings.BASE_PATH})")
+@app.get("/root/{sub_path:path}", response_class=HTMLResponse)
+async def path_contents(
+    sub_path: Path, request: Request, settings: Settings = Depends(get_settings)
+):
+    path = settings.BASE_PATH / sub_path
+    logger.debug(f"Request path: {sub_path} (BASE_PATH={settings.BASE_PATH}")
 
     contents = (File.from_path(p) for p in path.glob("*"))
     contents = sorted(contents, key=lambda f: f.name)
     context = {
         "request": request,
-        "contents": contents,
         "path": path,
+        "sub_path": sub_path,
         "base_path": settings.BASE_PATH,
+        "contents": contents,
         # Return the sub-path only if there is a sub-path
         "back_path": (
             path.parent.relative_to(settings.BASE_PATH)

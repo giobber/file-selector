@@ -24,10 +24,10 @@
         <input type="hidden" id="item-path-back" name="path" value="{{ back_path }}" />
         <a
           class="link"
-          hx-post="/root"
-          hx-include="#item-path-back"
+          hx-get="/root/{{ back_path }}"
           hx-target="#main"
           hx-swap="innerHTML"
+          hx-replace-url="/home/{{back_path}}"
         >
           Parent Folder
         </a>
@@ -42,18 +42,12 @@
       <td class="tc">{% if item.path.is_dir() %}🖿{% else %}🗋 {% endif %}</td>
       <td class="tl ph2 nowrap overflow-auto text-overflow measure-narrow">
         {% if item.path.is_dir() %}
-        <input
-          type="hidden"
-          id="item-path--{{loop.index}}"
-          name="path"
-          value="{{ item.path.relative_to(base_path) }}"
-        />
         <a
           class="link truncate"
-          hx-post="/root"
-          hx-include="#item-path--{{loop.index}}"
+          hx-get="/root/{{ item.path.relative_to(base_path) }}"
           hx-target="#main"
           hx-swap="innerHTML"
+          hx-replace-url="/home/{{ item.path.relative_to(base_path) }}"
         >
           {{ item.name }}
         </a>

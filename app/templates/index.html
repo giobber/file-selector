@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>HTMX + FastAPI</title>
+    <title>File Selector</title>
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <link
       rel="stylesheet"
@@ -9,22 +9,12 @@
     />
   </head>
   <body>
-    <h1>HTMX & FastAPI {% if debug %}(DEBUG){% endif %}</h1>
-    <header class="flex flex-row w-100">
-      <form id="form-path" hx-post="/root" hx-target="#main" hx-swap="innerHTML">
-        <input
-          id="form-path-input"
-          name="path"
-          type="text"
-          placeholder="Insert sub-path here"
-        />
-        <button type="submit">Go</button>
-      </form>
-    </header>
+    <h1>File Selector</h1>
+    <header class="flex flex-row w-100"></header>
     <main
       id="main"
       class="w-100 overflow-x-auto"
-      hx-get="/root"
+      hx-get="/root/{{ sub_path }}"
       hx-trigger="load"
     ></main>
   </body>
