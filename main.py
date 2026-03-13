@@ -21,14 +21,15 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, settings: Settings = Depends(get_settings)):
-    return templates.TemplateResponse(
-        "index.html", {"request": request, "debug": settings.DEBUG}
-    )
+    context = {"request": request, "debug": settings.DEBUG}
+    return templates.TemplateResponse("index.html", context)
 
 
-@app.post("/button-click", response_class=HTMLResponse)
-async def button_click():
-    return "<p>Hello from HTMX!</p>"
+@app.get("/path", response_class=HTMLResponse)
+async def path_contents(request: Request, settings: Settings = Depends(get_settings)):
+    contents = ({"name": p.stem} for p in settings.BASE_PATH.glob("*"))
+    context = {"request": request, "contents": contents}
+    return templates.TemplateResponse("table.j2.html", context)
 
 
 if __name__ == "__main__":
