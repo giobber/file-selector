@@ -8,12 +8,12 @@
       href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"
     />
   </head>
-  <body>
-    <h1>
-      <a class="black link" href="/">File Selector</a>
+  <body class="pv3 ph3">
+    <h1 class="tc">
+      <a class="near-black link" href="/">File Selector</a>
     </h1>
-    <header class="flex flex-row w-100">
-      <form hx-post="/root" hx-target="#main" hx-swap="innerHTML">
+    <header class="pv3 flex flex-row justify-center w-100">
+      <form hx-post="/hx/table" hx-target="#main" hx-swap="innerHTML">
         <input name="sub_path" type="text" />
         <button type="submit">Go</button>
       </form>
@@ -21,7 +21,7 @@
     <main
       id="main"
       class="w-100 overflow-x-auto"
-      hx-get="/root/{{ sub_path }}"
+      hx-get="/hx/table/{{ sub_path }}"
       hx-trigger="load"
     ></main>
   </body>

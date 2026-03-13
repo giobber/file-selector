@@ -43,9 +43,9 @@ async def search(request: Request):
     return RedirectResponse(url="/home")
 
 
-@app.get("/root", response_class=HTMLResponse)
-@app.post("/root", response_class=HTMLResponse)
-@app.get("/root/{sub_path:path}", response_class=HTMLResponse)
+@app.get("/hx/table", response_class=HTMLResponse)
+@app.post("/hx/table", response_class=HTMLResponse)
+@app.get("/hx/table/{sub_path:path}", response_class=HTMLResponse)
 async def path_contents(
     request: Request,
     sub_path: str = "",
