@@ -40,7 +40,12 @@
     <!-- Content rows-->
     {% for item in contents %}
     <tr>
-      <td><input type="checkbox" name="selected" /></td>
+      <td>
+        <input
+          type="checkbox" {% if item.selected %}checked{% endif %}
+          onclick="axios({url: '/api/select/{{ item.path.relative_to(base_path) }}', method: (this.checked) ? 'POST' : 'DELETE' })"
+        />
+      </td>
       <td class="tc">{% if item.path.is_dir() %}🖿{% else %}🗋 {% endif %}</td>
       <td class="tl ph2 nowrap overflow-auto text-overflow measure-narrow">
         {% if item.path.is_dir() %}

@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from loguru import logger
 
 from app.models import File, format_size
+from app.select import SelectionManager
 
 from .settings import Settings, get_settings, log_settings
 
@@ -20,6 +21,10 @@ app = FastAPI()
 # Set up Jinja2 templates
 templates = Jinja2Templates(directory="app/templates")
 templates.env.filters["formatsize"] = format_size(get_settings().BYTE_SIZE)
+
+
+selection = SelectionManager(path=get_settings().LIST_PATH)
+selection.ensure_exists()
 
 
 @app.get("/")
@@ -65,6 +70,12 @@ async def path_contents(
 
     contents = (File.from_path(p) for p in path.glob("*"))
     contents = sorted(contents, key=lambda f: f.name)
+
+    selected = selection.get_paths()
+    logger.debug(selected)
+    for item in contents:
+        item.selected = item.path in selected
+
     context = {
         "request": request,
         "path": path,
@@ -81,6 +92,22 @@ async def path_contents(
     # Note: technically there should be something that tell where the request come from before setting this header
     headers = {"HX-Push-Url": f"/home/{sub_path}"}
     return templates.TemplateResponse("table.html", context, headers=headers)
+
+
+@app.post("/api/select/{sub_path:path}")
+@app.delete("/api/select/{sub_path:path}")
+async def handle_selection(
+    request: Request,
+    sub_path: str,
+    settings: Settings = Depends(get_settings),
+):
+    match request.method:
+        case "POST":
+            logger.debug(f"Adding path: {sub_path}")
+            selection.add_path(settings.BASE_PATH / sub_path)
+        case "DELETE":
+            logger.debug(f"Removing path: {sub_path}")
+            selection.remove_path(settings.BASE_PATH / sub_path)
 
 
 if __name__ == "__main__":

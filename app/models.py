@@ -1,5 +1,6 @@
 import datetime as dt
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseModel, Field, computed_field
 
@@ -9,6 +10,7 @@ from app.settings import ByteSize
 class File(BaseModel):
     name: str
     path: Path = Field(repr=False)
+    selected: Optional[bool] = None
 
     def stat(self, follow_symlinks: bool = False):
         return self.path.stat(follow_symlinks=follow_symlinks)
@@ -17,11 +19,11 @@ class File(BaseModel):
     def size(self) -> int:
         return self.stat().st_size
 
-    @computed_field
+    @computed_field(repr=False)
     def created(self) -> dt.datetime:
         return dt.datetime.fromtimestamp(self.stat().st_ctime)
 
-    @computed_field
+    @computed_field(repr=False)
     def modified(self) -> dt.datetime:
         return dt.datetime.fromtimestamp(self.stat().st_mtime)
 

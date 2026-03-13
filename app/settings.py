@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: LogLevel | int = "INFO"
 
     BASE_PATH: Path = Path.home()
+    LIST_PATH: Path = Path.home() / "selection"
     BYTE_SIZE: ByteSize = "MB"
 
     class Config:
