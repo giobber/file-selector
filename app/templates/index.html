@@ -9,8 +9,15 @@
     />
   </head>
   <body>
-    <h1>File Selector</h1>
-    <header class="flex flex-row w-100"></header>
+    <h1>
+      <a class="black link" href="/">File Selector</a>
+    </h1>
+    <header class="flex flex-row w-100">
+      <form hx-post="/root" hx-target="#main" hx-swap="innerHTML">
+        <input name="sub_path" type="text" />
+        <button type="submit">Go</button>
+      </form>
+    </header>
     <main
       id="main"
       class="w-100 overflow-x-auto"

@@ -1,5 +1,4 @@
 import sys
-from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -30,17 +29,39 @@ async def base(request: Request):
 
 @app.get("/home")
 @app.get("/home/{sub_path:path}", response_class=HTMLResponse)
-async def home(request: Request, sub_path: Path = Path("")):
+async def home(request: Request, sub_path: str = ""):
     context = {"request": request, "sub_path": sub_path}
     return templates.TemplateResponse("index.html", context)
 
 
+@app.post("/search")
+async def search(request: Request):
+    form_data = await request.form()
+    sub_path = form_data.get("sub_path", None)
+    if isinstance(sub_path, str):
+        return await home(request, sub_path)
+    return RedirectResponse(url="/home")
+
+
+@app.get("/root", response_class=HTMLResponse)
+@app.post("/root", response_class=HTMLResponse)
 @app.get("/root/{sub_path:path}", response_class=HTMLResponse)
 async def path_contents(
-    sub_path: Path, request: Request, settings: Settings = Depends(get_settings)
+    request: Request,
+    sub_path: str = "",
+    settings: Settings = Depends(get_settings),
 ):
+    if request.method == "POST":
+        form_data = await request.form()
+        value = form_data.get("sub_path", "")
+        if value and isinstance(value, str):
+            sub_path = value
+
     path = settings.BASE_PATH / sub_path
-    logger.debug(f"Request path: {sub_path} (BASE_PATH={settings.BASE_PATH}")
+
+    logger.debug(f"Request path: {sub_path}")
+    logger.debug(f"Base path: {settings.BASE_PATH}")
+    logger.debug(f"Full path: {path}")
 
     contents = (File.from_path(p) for p in path.glob("*"))
     contents = sorted(contents, key=lambda f: f.name)
@@ -57,7 +78,9 @@ async def path_contents(
             else None
         ),
     }
-    return templates.TemplateResponse("table.html", context)
+    # Note: technically there should be something that tell where the request come from before setting this header
+    headers = {"HX-Push-Url": f"/home/{sub_path}"}
+    return templates.TemplateResponse("table.html", context, headers=headers)
 
 
 if __name__ == "__main__":
