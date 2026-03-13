@@ -5,7 +5,8 @@
     <script src="https://unpkg.com/htmx.org@1.9.6"></script>
   </head>
   <body>
-    <h1>Click the Button:</h1>
+    <h1>HTMX & FastAPI {% if debug %}(DEBUG){% endif %}</h1>
+    <h2>Click the Button:</h2>
     <button hx-post="/button-click" hx-swap="outerHTML">Click Me</button>
   </body>
 </html>

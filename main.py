@@ -1,6 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+
+from config.settings import Settings, get_settings
 
 app = FastAPI()
 
@@ -9,8 +11,11 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def home(request: Request, settings: Settings = Depends(get_settings)):
+    print(settings)
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "debug": settings.DEBUG}
+    )
 
 
 @app.post("/button-click", response_class=HTMLResponse)
