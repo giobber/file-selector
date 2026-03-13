@@ -4,7 +4,8 @@ from typing import Literal
 from loguru import logger
 from pydantic_settings import BaseSettings
 
-LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+type LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]
+type ByteSize = Literal["TB", "GB", "MB", "KB", "B"]
 
 
 class Settings(BaseSettings):
@@ -12,6 +13,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: LogLevel | int = "INFO"
 
     BASE_PATH: Path = Path.home()
+    BYTE_SIZE: ByteSize = "MB"
 
     class Config:
         env_file = ".env"

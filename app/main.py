@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from loguru import logger
 
-from app.models import File
+from app.models import File, format_size
 
 from .settings import Settings, get_settings, log_settings
 
@@ -19,6 +19,7 @@ app = FastAPI()
 
 # Set up Jinja2 templates
 templates = Jinja2Templates(directory="app/templates")
+templates.env.filters["formatsize"] = format_size(get_settings().BYTE_SIZE)
 
 
 @app.get("/", response_class=HTMLResponse)

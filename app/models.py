@@ -3,6 +3,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, computed_field
 
+from app.settings import ByteSize
+
 
 class File(BaseModel):
     name: str
@@ -26,3 +28,19 @@ class File(BaseModel):
     @classmethod
     def from_path(cls, path: Path):
         return cls(name=path.stem, path=path)
+
+
+def format_size(default_byte_size: ByteSize):
+    def func(size: int, byte_size: ByteSize = default_byte_size) -> str:
+        match byte_size:
+            case "TB":
+                size >>= 40
+            case "GB":
+                size >>= 30
+            case "MB":
+                size >>= 20
+            case "KB":
+                size >>= 10
+        return f"{size} {byte_size}"
+
+    return func
